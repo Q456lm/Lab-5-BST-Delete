@@ -26,20 +26,41 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
     // ── Search ────────────────────────────────────────────────────────────
     @Override
     public boolean search(E e) {
-        // TODO: return true if e is in the tree, false otherwise
         // Follow the invariant from root.
         // Return false when current becomes null (fell off the tree).
-        return false; // replace this
+        TreeNode<E> current = root;
+        while (current != null){
+            int cmp = e.compareTo(current.element);
+            if (cmp < 0) current = current.left;
+            else if (cmp > 0) current = current.right;
+            else return true;
+        }
+        return false;
     }
 
     // ── Insert ────────────────────────────────────────────────────────────
     @Override
     public boolean insert(E e) {
-        // TODO: insert e into the correct position
-        // Return false if e is already in the tree (duplicate).
-        // Return true if inserted successfully.
-        // Remember to increment size on a successful insert.
-        return false; // replace this
+        if (root == null){
+            root = new TreeNode<>(e);
+            size++;
+            return true;
+        }
+        TreeNode<E> parent = null;
+        TreeNode<E> current = root;
+        while (current != null){
+            int cmp = e.compareTo(current.element);
+            if (cmp < 0) { parent = current; current = current.left; }
+            else if (cmp > 0) { parent = current; current = current.right; }
+            else return false;
+        }
+        if (e.compareTo(parent.element) < 0)
+            parent.left = new TreeNode<>(e);
+        else{
+            parent.right = new TreeNode<>(e);
+        }
+        size++;
+        return true;
     }
 
     // ── Delete ────────────────────────────────────────────────────────────
@@ -48,6 +69,7 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
         // Step 1: find the node -- same path as search, tracking parent
         TreeNode<E> parent  = null;
         TreeNode<E> current = root;
+        TreeNode<E> superParent;
 
         while (current != null) {
             int cmp = e.compareTo(current.element);
@@ -59,21 +81,37 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
         if (current == null) return false; // not found
 
         // Step 2: determine which case applies and handle it
-        // TODO Case 1: current has no children
-        //   -- set parent's left or right to null
-        //   -- handle the special case where current is the root
+        if (current.left == null && current.right == null){
+            if (parent.left == current) {
+                parent.left = null;
+            }else {
+                parent.right = null;
+            }
+        }
 
-        // TODO Case 2: current has one child
-        //   -- set parent's pointer to current's only child
-        //   -- handle the special case where current is the root
+        else if (current.left == null || current.right == null){
+            if (current.left == null){
+                System.out.println("left");
+                parent.left = current.right;
+                current.right = null;
+            }else{
+                parent.right = current.left;
+                current.left = null;
+            }
+        }
 
-        // TODO Case 3: current has two children
-        //   -- find the in-order successor: go right once, then left as far as possible
-        //   -- copy successor's value into current
-        //   -- delete the successor (it has at most one child, so Case 1 or 2)
+        else{
+            superParent = parent;
+            parent = current; current = current.right;
+            while (current != null){
+                parent = current; current = current.left;
+            }
+            superParent = parent;
+            parent = null;
+        }
 
-        // TODO: decrement size and return true
-        return false; // replace this
+        size--;
+        return true;
     }
 
     // ── Inorder traversal ─────────────────────────────────────────────────
@@ -83,8 +121,10 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
     }
 
     private void inorder(TreeNode<E> node) {
-        // TODO: implement inorder traversal (left -> visit -> right)
-        // Base case: if node is null, return.
+        if (node == null) return;
+        inorder(node.left);
+        System.out.print(node.element + " ");
+        inorder(node.right);
     }
 
     // ── Preorder traversal ────────────────────────────────────────────────
@@ -94,8 +134,10 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
     }
 
     private void preorder(TreeNode<E> node) {
-        // TODO: implement preorder traversal (visit -> left -> right)
-        // Base case: if node is null, return.
+        if (node == null) return;
+        System.out.print(node.element + " ");
+        preorder(node.left);
+        preorder(node.right);
     }
 
     // ── Postorder traversal ───────────────────────────────────────────────
@@ -105,8 +147,10 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
     }
 
     private void postorder(TreeNode<E> node) {
-        // TODO: implement postorder traversal (left -> right -> visit)
-        // Base case: if node is null, return.
+        if (node == null) return;
+        postorder(node.left);
+        postorder(node.right);
+        System.out.print(node.element + " ");
     }
 
     // ── Size and empty ────────────────────────────────────────────────────
