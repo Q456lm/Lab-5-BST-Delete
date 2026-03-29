@@ -102,22 +102,21 @@ public class BST<E extends Comparable<E>> implements Tree<E> {
 
         else{
             TreeNode<E> successor;
-            superParent = current;
-            successor = current;
-            current = current.right;
-            while (current != null){
-                successor = current; current = current.left;
+            TreeNode<E> successor2;
+            successor = current.right;
+            successor2 = current;
+            boolean done = false;
+            while (successor.left != null){
+                successor = successor.left;
+                successor2 = successor;
+                done = true;
             }
-            //superParent.element = parent.element;
-            preorder();
-            System.out.println();
-            if (parent.left == superParent) {
-                parent.left = successor;
-            }else {
-                parent.right = successor;
+            current.element = successor.element;
+            if (done){  
+                successor2.left = null;
+            }else{
+                successor2.right = null;
             }
-            preorder();
-            System.out.println();
         }
 
         size--;
